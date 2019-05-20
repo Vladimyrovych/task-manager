@@ -1,0 +1,30 @@
+@import '../../mixins.scss';
+
+.task-list-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	&__done-control {
+		@include mobile {
+			margin-bottom: 10px;
+		}	
+	}
+	@include mobile {
+		padding: 10px 10px;
+		flex-wrap: wrap;
+	}
+	&__body {
+		margin: 0 30px;
+		width: 100%;
+		@include mobile {
+			margin: 0;
+			overflow: auto;
+		}	
+	}
+	&__text-area, .form-control {
+		resize: vertical;
+		@include mobile {
+			height: 60px;
+		}	
+	}
+}

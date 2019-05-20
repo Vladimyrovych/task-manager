@@ -1,0 +1,14 @@
+.app {
+	&__header {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+	}
+	&__hello-admin {
+		margin-right: 20px;
+	}
+	&__pagination-nav {
+		padding: 20px 0;
+		text-align: center;
+	}
+}
