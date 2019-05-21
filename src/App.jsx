@@ -20,8 +20,11 @@ class App extends Component {
 		pageCount: 1,
 		currentPage: 0,
 
-		sortField: 'username',
-		sortDirection: 'asc',
+		// sortField: 'username',
+		// sortDirection: 'asc',
+		sortDirectionName: 'asc',
+		sortDirectionEmail: 'asc',
+		sortDirectionStatus: 'asc',
 
 		isCreateTaskShow: false,
 		userNameValue: '',
