@@ -18,13 +18,12 @@ class App extends Component {
 		isAuthFormShow: false,
 
 		pageCount: 1,
-		currentPage: 0,
+		currentPage: 1,
 
-		// sortField: 'username',
-		// sortDirection: 'asc',
 		sortDirectionName: 'asc',
 		sortDirectionEmail: 'asc',
 		sortDirectionStatus: 'asc',
+		currentSortField: 'username',
 
 		isCreateTaskShow: false,
 		userNameValue: '',
@@ -39,52 +38,51 @@ class App extends Component {
 	TaskRequests = new Requests();
 
 	changeText = (textValue) => {
-		this.setState({textValue: textValue});
+		this.setState({ textValue: textValue });
 	}
 
-	/*---------------------------------Start create task-----------------------------------------*/
+	/*-------------- -------------------Start create task-----------------------------------------*/
 	createTask = () => {
 		let formData = new FormData();
-        formData.append("username", this.state.userNameValue);
-        formData.append("email", this.state.emailValue);
-        formData.append("text", this.state.textValue);
+		formData.append("username", this.state.userNameValue);
+		formData.append("email", this.state.emailValue);
+		formData.append("text", this.state.textValue);
 		this.TaskRequests.createData(this.createTasksProcessing, formData);
 	}
-	createTasksProcessing = (response) => {
+	createTasksProcessing = () => {
 		this.closeCreateTask();
-		this.getTasks(this.state.sortField, this.state.sortDirection, 1);
+		this.TaskRequests.getData(this.getTasksProcessing, 'name', this.state.sortDirectionName, 1);
 	}
 
 	openCreateTask = () => {
-		this.setState({isCreateTaskShow: true});
+		this.setState({ isCreateTaskShow: true });
 	}
 	closeCreateTask = () => {
 		this.setState({
 			isCreateTaskShow: false,
 			userNameValue: '',
 			emailValue: '',
-			textValue: '',	
+			textValue: '',
 		});
 	}
 	changeUserName = (userNameValue) => {
-		this.setState({userNameValue: userNameValue});
+		this.setState({ userNameValue: userNameValue });
 	}
 	changeEmail = (emailValue) => {
-		this.setState({emailValue: emailValue});
+		this.setState({ emailValue: emailValue });
 	}
 	/*---------------------------------End create task-----------------------------------------*/
 
 	/*---------------------------------Start update task-----------------------------------------*/
 	updateTask = () => {
 		let formData = new FormData();
-        formData.append("status", this.state.satus);
-        formData.append("text", this.state.textValue);
-
+		formData.append("status", this.state.satus);
+		formData.append("text", this.state.textValue);
 		this.TaskRequests.updateData(this.updateTasksProcessing, formData, this.state.taskId);
 	}
 	updateTasksProcessing = () => {
 		this.closeUpdateTask();
-		this.getTasks(this.state.sortField, this.state.sortDirection, 1);
+		this.TaskRequests.getData(this.getTasksProcessing, this.state.currentSortField, this.state.sortDirection, this.state.currentPage);
 	}
 
 	openUpdateTask = (status, textValue, taskId) => {
@@ -96,68 +94,104 @@ class App extends Component {
 		});
 	}
 	closeUpdateTask = () => {
-		this.setState({isUpdateTaskShow: false});
+		this.setState({ isUpdateTaskShow: false });
 	}
 	/*---------------------------------End update task-----------------------------------------*/
 
 	/*---------------------------------Start auth-----------------------------------------*/
 	openAuthForm = () => {
-		this.setState({isAuthFormShow: true});
+		this.setState({ isAuthFormShow: true });
 	}
 	clickCencelAuth = () => {
-		this.setState({isAuthFormShow: false});
+		this.setState({ isAuthFormShow: false });
 	}
 	changeLogin = (loginValue) => {
-		this.setState({loginValue: loginValue});
+		this.setState({ loginValue: loginValue });
 	}
 	changePass = (passValue) => {
-		this.setState({passValue: passValue});
+		this.setState({ passValue: passValue });
 	}
 	clickSignIn = () => {
 		if (this.state.loginValue === 'admin' && this.state.passValue === '123') {
 			this.clickCencelAuth();
-			this.setState({isAdminSign: true});
+			this.setState({ isAdminSign: true });
 		} else {
 			this.clickCencelAuth();
-			this.setState({isAdminSign: false});
+			this.setState({ isAdminSign: false });
 		}
 	}
 	/*---------------------------------End auth-----------------------------------------*/
 
-	getTasks = (sortField, sortDirection, pageNumber) => {
-		this.TaskRequests.getData(this.getTasksProcessing, sortField, sortDirection, pageNumber);
-	}
-	getTasksProcessing = (response, page) => {
+	getTasksProcessing = (response, currentPage) => {
 		this.setState({
 			tasks: response.message.tasks,
-			currentPage: page,
+			currentPage: currentPage,
 			pageCount: (Math.trunc(response.message.total_task_count / 3) + 1),
 		})
 	}
 	toPage = (pageNumber) => {
-		this.getTasks(this.state.sortField, this.state.sortDirection, pageNumber)
+		if (this.state.currentSortField === 'username') {
+			this.TaskRequests.getData(this.getTasksProcessing, this.state.currentSortField, this.state.sortDirectionName, pageNumber)
+		}
+		if (this.state.currentSortField === 'email') {
+			this.TaskRequests.getData(this.getTasksProcessing, this.state.currentSortField, this.state.sortDirectionEmail, pageNumber)
+		}
+		if (this.state.currentSortField === 'status') {
+			this.TaskRequests.getData(this.getTasksProcessing, this.state.currentSortField, this.state.sortDirectionStatus, pageNumber)
+		}
 	}
-	toSortBy = (sortField, pageNumber) => {
-		if (this.state.sortField === sortField) {
-			if (this.state.sortDirection === 'asc') {
-				this.setState({sortDirection: 'desc'});
-			} else {
-				this.setState({sortDirection: 'asc'});
+	getSortedData = (currentSortField) => {
+		if (this.state.currentSortField === currentSortField) {
+			if (currentSortField === 'username') {
+				if (this.state.sortDirectionName === 'asc') {
+					this.setState({ sortDirectionName: 'desc' });
+					this.TaskRequests.getData(this.getTasksProcessing, currentSortField, 'desc', this.state.currentPage);	
+				} else {
+					this.setState({ sortDirectionName: 'asc' });
+					this.TaskRequests.getData(this.getTasksProcessing, currentSortField, 'asc', this.state.currentPage);
+				}			
+			}
+			if (currentSortField === 'email') {
+				if (this.state.sortDirectionEmail === 'asc') {
+					this.setState({ sortDirectionEmail: 'desc' });
+					this.TaskRequests.getData(this.getTasksProcessing, currentSortField, 'desc', this.state.currentPage);
+				} else {
+					this.setState({ sortDirectionEmail: 'asc' });
+					this.TaskRequests.getData(this.getTasksProcessing, currentSortField, 'asc', this.state.currentPage);
+				}	
+			}
+			if (currentSortField === 'status') {
+				if (this.state.sortDirectionStatus === 'asc') {
+					this.setState({ sortDirectionStatus: 'desc' });
+					this.TaskRequests.getData(this.getTasksProcessing, currentSortField, 'desc', this.state.currentPage);
+				} else {
+					this.setState({ sortDirectionStatus: 'asc' });
+					this.TaskRequests.getData(this.getTasksProcessing, currentSortField, 'asc', this.state.currentPage);
+				}	
+			}
+		} else {
+			this.setState({ currentSortField: currentSortField });
+			if (currentSortField === 'username') {
+				this.TaskRequests.getData(this.getTasksProcessing, currentSortField, this.state.sortDirectionName, this.state.currentPage);
+			}
+			if (currentSortField === 'email') {
+				this.TaskRequests.getData(this.getTasksProcessing, currentSortField, this.state.sortDirectionEmail, this.state.currentPage);
+			}
+			if (currentSortField === 'status') {
+				this.TaskRequests.getData(this.getTasksProcessing, currentSortField, this.state.sortDirectionStatus, this.state.currentPage);
 			}
 		}
-		this.setState({sortField: sortField});
-		this.getTasks(sortField, this.state.sortDirection, pageNumber);
 	}
 
-	render () {
+	render() {
 		if (this.state.tasks.length === 0) {
-			this.getTasks(this.state.sortField, this.state.sortDirection, 1);
+			this.TaskRequests.getData(this.getTasksProcessing, this.state.currentSortField, this.state.sortDirectionName, this.state.currentPage);
 			return null;
 		}
 
 		let authForm = '';
 		if (this.state.isAuthFormShow === true) {
-			authForm = <AuthForm 
+			authForm = <AuthForm
 				clickCencelAuth={this.clickCencelAuth}
 				loginValue={this.state.loginValue}
 				passValue={this.state.passValue}
@@ -171,7 +205,7 @@ class App extends Component {
 
 		let createTask = '';
 		if (this.state.isCreateTaskShow === true) {
-			createTask = <CreateTask 
+			createTask = <CreateTask
 				closeCreateTask={this.closeCreateTask}
 				createTask={this.createTask}
 				userNameValue={this.state.userNameValue}
@@ -179,7 +213,7 @@ class App extends Component {
 				textValue={this.state.textValue}
 				changeUserName={this.changeUserName}
 				changeEmail={this.changeEmail}
-				changeText={this.changeText}			
+				changeText={this.changeText}
 			/>
 		} else {
 			createTask = null;
@@ -187,29 +221,28 @@ class App extends Component {
 
 		let updateTask = '';
 		if (this.state.isUpdateTaskShow === true) {
-			updateTask = <UpdateTask 
+			updateTask = <UpdateTask
 				closeUpdateTask={this.closeUpdateTask}
 				updateTask={this.updateTask}
 				status={this.state.status}
 				textValue={this.state.textValue}
-				changeText={this.changeText}			
+				changeText={this.changeText}
 			/>
 		} else {
 			updateTask = null;
 		}
-	
+
 		return (
 			<div className='app jumbotron container'>
 				<header className='app__header'>
-					{this.state.isAdminSign === true? <h4 className='app__hello-admin'>Hello, admin!</h4>:null}
+					{this.state.isAdminSign === true ? <h4 className='app__hello-admin'>Hello, admin!</h4> : null}
 					<button className='app__sign-in-btn btn-lg btn-warning' onClick={this.openAuthForm}>SIGN IN</button>
 				</header>
 				<h1 className='app__title'>Task manager</h1>
 				<main className='app__main'>
-					<ControlPanel 
-						sortField={this.state.sortField} 
-						toSortBy={this.toSortBy} 
-						pageNumber={this.state.currentPage}
+					<ControlPanel
+						currentSortField={this.state.currentSortField}
+						getSortedData={this.getSortedData}
 						openCreateTask={this.openCreateTask}
 					/>
 					<TaskList tasks={this.state.tasks} isAdminSign={this.state.isAdminSign} openUpdateTask={this.openUpdateTask} />
@@ -221,8 +254,9 @@ class App extends Component {
 				{createTask}
 				{updateTask}
 			</div>
-		)	
+		)
 	}
+
 }
 
 export default App;

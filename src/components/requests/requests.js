@@ -34,7 +34,6 @@ export default class Requests {
 		})
         .then(response => response.json())
         .then(response => {
-            console.log(response);
 			resultsProcessing();
         })
         .catch((e) => console.log(e));

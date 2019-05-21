@@ -4,7 +4,11 @@ import PaginationItem from '../paginationItem/PaginationItem';
 
 const Pagination = ({pageCount, currentPage, toPage}) => {
 	const toPreviousPages = () => {
-		toPage(currentPage - 3);
+		if (currentPage === 3) {
+			toPage(currentPage - 2);
+		} else {
+			toPage(currentPage - 3);
+		}
 	}
 	const toNextPages = () => {
 		toPage(currentPage + 3);
@@ -29,13 +33,13 @@ const Pagination = ({pageCount, currentPage, toPage}) => {
 	const pages = [];
 	
 	if (currentPage > 1 && currentPage < (pageCount)) {
-		pages.push(<PaginationItem pageNumber={currentPage - 1} toPage={toPage} />)
-		pages.push(<PaginationItem pageNumber={currentPage} isCurrentPage={true} toPage={toPage} />)
-		pages.push(<PaginationItem pageNumber={currentPage + 1} toPage={toPage} />)
+		pages.push(<PaginationItem key={currentPage - 1} pageNumber={currentPage - 1} toPage={toPage} />)
+		pages.push(<PaginationItem key={currentPage} pageNumber={currentPage} isCurrentPage={true} toPage={toPage} />)
+		pages.push(<PaginationItem key={currentPage + 1} pageNumber={currentPage + 1} toPage={toPage} />)
 	} 
 	if (currentPage === 1) {
-		pages.push(<PaginationItem pageNumber={currentPage} isCurrentPage={true} toPage={toPage} />)
-		pages.push(<PaginationItem pageNumber={currentPage + 1} toPage={toPage} />)
+		pages.push(<PaginationItem key={currentPage} pageNumber={currentPage} isCurrentPage={true} toPage={toPage} />)
+		pages.push(<PaginationItem key={currentPage + 1} pageNumber={currentPage + 1} toPage={toPage} />)
 	}
 	if (currentPage === pageCount) {
 		pages.push(<PaginationItem pageNumber={currentPage - 1} toPage={toPage} />)
