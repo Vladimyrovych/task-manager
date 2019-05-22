@@ -6,9 +6,27 @@ const CreateTask = ({userNameValue, emailValue, textValue, closeCreateTask, crea
 		event.preventDefault();
 		closeCreateTask();
 	}
+
+	let isInvalidClassName = '';
+	let placeholder = "";
+
+	if (emailValue.indexOf('@') !== -1) {
+		if (emailValue.indexOf('.', emailValue.indexOf('@')) !== -1) {
+			
+		} else {
+			isInvalidClassName = 'is-invalid';
+			placeholder = 'example@box.com';
+		}
+	} else {
+		isInvalidClassName = 'is-invalid';
+		placeholder = 'example@box.com';
+	}
+
 	const onClickCreateTask = (event) => {
 		event.preventDefault();
-		createTask();
+		if (isInvalidClassName !== 'is-invalid') {
+			createTask();	
+		}
 	}
 	const onChangeUserName = (event) => {
 		changeUserName(event.target.value);
@@ -29,7 +47,7 @@ const CreateTask = ({userNameValue, emailValue, textValue, closeCreateTask, crea
 				</div>
 				<div className="create-task__email-block form-group">
 					<label className='create-task__email-label' htmlFor="email">Email</label>
-					<input className="create-task__email-input form-control" defaultValue={emailValue} onChange={onChangeEmail} type="email" id="email" placeholder="Enter email"/>
+					<input className={`create-task__email-input form-control ${isInvalidClassName}`} value={emailValue} onChange={onChangeEmail} type="email" id="email" placeholder={placeholder} />
 				</div>
 				<div className="create-task__text-block form-group">
 					<label className='create-task__text-label' htmlFor="text">Text</label>
